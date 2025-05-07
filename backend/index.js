@@ -1,12 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const bookRoutes = require('./routes/bookRoutes'); // Upewnij się, że plik się zgadza
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use('/api/books', bookRoutes); // Wszystkie requesty do /api/books będą kierowane do bookRoutes
+app.use('/api/users', userRoutes);
 
 // Globalny middleware błędów
 app.use((err, req, res, next) => {
