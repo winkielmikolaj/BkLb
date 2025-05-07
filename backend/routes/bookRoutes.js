@@ -2,10 +2,16 @@ const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/bookController");
 
-// endpoints
-router.get("/books", bookController.getAllBooks);
-router.post("/books", bookController.addBook);
-router.delete("/books/:id", bookController.deleteBook);
-router.put("/books/:id", bookController.updateBook);
+// Obsługa GET /api/books
+router.get("/", bookController.getAllBooks);
+
+// Obsługa POST /api/books
+router.post("/", bookController.addBook);
+
+// Obsługa PUT /api/books/:id
+router.put("/:id", bookController.updateBook);
+
+// Obsługa DELETE /api/books/:id
+router.delete("/:id", bookController.deleteBook);
 
 module.exports = router;

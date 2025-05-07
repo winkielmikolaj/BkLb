@@ -7,7 +7,16 @@ function App() {
 
   // Funkcja do pobierania książek
   const fetchBooks = async () => {
-    const response = await fetch('http://localhost:3000/api/books');
+    const response = await fetch('http://localhost:3000/api/books', {
+      method: 'GET', // Zmieniono na GET
+      headers: { 'Content-Type': 'application/json' },
+    });
+  
+    if (!response.ok) {
+      console.error('Failed to fetch books:', response.statusText);
+      return alert('Nie udało się pobrać książek');
+    }
+  
     const data = await response.json();
     setBooks(data);
   };
@@ -56,7 +65,7 @@ function App() {
 
   return (
     <div style={{ padding: '1rem' }}>
-      <h1>Lista książek oooooooooooo</h1>
+      <h1>Lista książek</h1>
       <ul id="bookList">
         {books.map((book) => (
           <li key={book.id}>

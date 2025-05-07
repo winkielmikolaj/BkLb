@@ -1,36 +1,38 @@
-const { db } = require('../db'); // Upewnij się, że ścieżka do db.js jest poprawna
-
-class Book {
-  static getAll() {
-    return db.prepare('SELECT * FROM books').all();
+let books = [
+    { id: 1, title: "Książka 1", author: "Autor 1" },
+    { id: 2, title: "Książka 2", author: "Autor 2" },
+  ];
+  
+  class Book {
+    static getAll() {
+      return books;
+    }
+  
+    static getById(id) {
+      return books.find((book) => book.id === id);
+    }
+  
+    static create({ title, author }) {
+      const newBook = { id: books.length + 1, title, author };
+      books.push(newBook);
+      return newBook;
+    }
+  
+    static update(id, updates) {
+      const bookIndex = books.findIndex((book) => book.id === id);
+      if (bookIndex === -1) return null;
+  
+      books[bookIndex] = { ...books[bookIndex], ...updates };
+      return books[bookIndex];
+    }
+  
+    static delete(id) {
+      const bookIndex = books.findIndex((book) => book.id === id);
+      if (bookIndex === -1) return null;
+  
+      const deletedBook = books.splice(bookIndex, 1);
+      return deletedBook;
+    }
   }
-
-  static getById(id) {
-    return db.prepare('SELECT * FROM books WHERE id = ?').get(id);
-  }
-
-  static create({ title, author }) {
-    const result = db.prepare(`
-      INSERT INTO books (title, author) 
-      VALUES (?, ?)
-    `).run(title, author);
-
-    return this.getById(result.lastInsertRowid);
-  }
-
-  static update(id, { title, author, is_rented }) {
-    db.prepare(`
-      UPDATE books 
-      SET title = ?, author = ?, is_rented = ?
-      WHERE id = ?
-    `).run(title, author, is_rented, id);
-    
-    return this.getById(id);
-  }
-
-  static delete(id) {
-    db.prepare('DELETE FROM books WHERE id = ?').run(id);
-  }
-}
-
-module.exports = Book;
+  
+  module.exports = Book;

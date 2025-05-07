@@ -14,4 +14,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-app.listen(3000, () => console.log('Backend running on port 3000'));
+const PORT = 3000; // Port backendu
+app.listen(PORT, () => {
+  console.log(`Serwer działa na porcie ${PORT}`);
+});
