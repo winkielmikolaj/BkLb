@@ -1,3 +1,7 @@
+.container {
+  display: flex;
+  justify-content: flex-end;
+}
 .auth-container {
   max-width: 400px;
   margin: 50px auto;

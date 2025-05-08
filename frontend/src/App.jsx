@@ -144,52 +144,56 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <h1>Lista książek</h1>
-      <button className="logout-button" onClick={() => setIsLoggedIn(false)}>
-        Wyloguj
-      </button>
-      <ul className="book-list">
-        {books.map((book) => (
-          <li key={book.id} className="book-item">
-            <span>
-              {book.title} by {book.author}
-            </span>
-            <button
-              className="delete-button"
-              onClick={() => handleDeleteBook(book.id)}
-            >
-              Usuń
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <h2>Dodaj książkę</h2>
-      <form className="book-form" onSubmit={handleAddBook}>
-        <input
-          className="auth-input"
-          type="text"
-          id="title"
-          placeholder="Tytuł"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <input
-          className="auth-input"
-          type="text"
-          id="author"
-          placeholder="Autor"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          required
-        />
-        <button className="add-button" type="submit">
-          Dodaj
+    <>
+      <div className="container">
+        <button className="logout-button"  onClick={() => setIsLoggedIn(false)}>
+          Wyloguj
         </button>
-      </form>
-    </div>
+      </div >
+      <div className="app-container">
+        <h1>Lista książek</h1>
+        <ul className="book-list">
+          {books.map((book) => (
+            <li key={book.id} className="book-item">
+              <span>
+                {book.title} by {book.author}
+              </span>
+              <button
+                className="delete-button"
+                onClick={() => handleDeleteBook(book.id)}
+              >
+                Usuń
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <h2>Dodaj książkę</h2>
+        <form className="book-form" onSubmit={handleAddBook}>
+          <input
+            className="auth-input"
+            type="text"
+            id="title"
+            placeholder="Tytuł"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <input
+            className="auth-input"
+            type="text"
+            id="author"
+            placeholder="Autor"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            required
+          />
+          <button className="add-button" type="submit">
+            Dodaj
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
 

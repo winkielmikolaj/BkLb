@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bookRoutes = require('./routes/bookRoutes'); // Upewnij się, że plik się zgadza
 const userRoutes = require('./routes/userRoutes');
+require('./init'); // Importujemy inicjalizację bazy danych
 
 const app = express();
 app.use(cors());
@@ -16,7 +17,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-const PORT = 3000; // Port backendu
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Serwer działa na porcie ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
