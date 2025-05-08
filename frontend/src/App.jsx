@@ -14,6 +14,19 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [wordsPerPage] = useState(300); // Liczba słów na stronę
+
+  // Funkcja do podziału tekstu na strony
+  const splitContentIntoPages = (text) => {
+    if (!text) return [];
+    const words = text.split(/\s+/);
+    const pages = [];
+    for (let i = 0; i < words.length; i += wordsPerPage) {
+      pages.push(words.slice(i, i + wordsPerPage).join(' '));
+    }
+    return pages;
+  };
 
   // Funkcja do pobierania książek
   const fetchBooks = async () => {
@@ -31,6 +44,11 @@ function App() {
       fetchBooks();
     }
   }, [isLoggedIn]);
+
+  // Reset paginacji przy zmianie książki
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBook]);
 
   // Funkcja dodająca książkę
   const handleAddBook = async (e) => {
@@ -196,6 +214,9 @@ function App() {
     );
   }
 
+  const contentPages = selectedBook ? splitContentIntoPages(selectedBook.content) : [];
+  const totalPages = contentPages.length;
+
   return (
     <>
       <div className="container">
@@ -244,7 +265,30 @@ function App() {
             {selectedBook.content && (
               <div className="book-content">
                 <h3>Treść:</h3>
-                <p>{selectedBook.content}</p>
+                <div className="book-page">
+                  <p>{contentPages[currentPage - 1]}</p>
+                </div>
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    <button
+                      className="page-button"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Poprzednia
+                    </button>
+                    <span className="page-info">
+                      Strona {currentPage} z {totalPages}
+                    </span>
+                    <button
+                      className="page-button"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Następna
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

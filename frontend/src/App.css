@@ -236,7 +236,60 @@
   border: 1px solid #dee2e6;
 }
 
+.book-content p {
+  white-space: pre-wrap;       /* Zachowuje podziały linii i spacje */
+  word-wrap: break-word;       /* Zawija długie słowa */
+  overflow-wrap: break-word;   /* Zawija długie słowa w nowszych przeglądarkach */
+  line-height: 1.6;           /* Zwiększa odstęp między liniami dla lepszej czytelności */
+  text-align: justify;        /* Wyrównuje tekst do obu marginesów */
+  max-width: 100%;           /* Zapewnia, że tekst nie wyjdzie poza kontener */
+  margin: 0;                 /* Usuwa domyślne marginesy */
+}
+
 .user-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.book-page {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.page-button {
+  padding: 8px 16px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.page-button:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.page-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.page-info {
   font-size: 0.9rem;
   color: #6c757d;
 }
