@@ -229,34 +229,41 @@ function App() {
       </div>
       <div className="app-container">
         <h1>Lista książek</h1>
-        <ul className="book-list">
+        <div className="books-grid">
           {books.map((book) => (
-            <li key={book.id} className="book-item">
-              <div className="book-info" onClick={() => setSelectedBook(book)}>
-                <span>
-                  {book.title} by {book.author}
-                </span>
-                {book.content && <span className="has-content">✓</span>}
+            <div 
+              key={book.id} 
+              className="book-tile"
+              onClick={() => setSelectedBook(book)}
+            >
+              <div className="book-image-placeholder">
+                {/* Placeholder for future book cover images */}
+                <div className="book-image-text">{book.title.charAt(0)}</div>
               </div>
-              {currentUser?.role === 'admin' && (
-                <div className="book-actions">
-                  <button
-                    className="edit-button"
-                    onClick={() => startEditing(book)}
-                  >
-                    Edytuj
-                  </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDeleteBook(book.id)}
-                  >
-                    Usuń
-                  </button>
-                </div>
-              )}
-            </li>
+              <div className="book-tile-info">
+                <h3 className="book-title">{book.title}</h3>
+                <p className="book-author">{book.author}</p>
+                {book.content && <span className="has-content">✓</span>}
+                {currentUser?.role === 'admin' && (
+                  <div className="book-actions" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="edit-button"
+                      onClick={() => startEditing(book)}
+                    >
+                      Edytuj
+                    </button>
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDeleteBook(book.id)}
+                    >
+                      Usuń
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
 
         {selectedBook && (
           <div className="book-details">
