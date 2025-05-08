@@ -42,7 +42,9 @@ exports.login = (req, res) => {
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    res.json({ message: "Login successful", userId: user.id });
+    // Return user info without password
+    const { password: _, ...userInfo } = user;
+    res.json({ message: "Login successful", user: userInfo });
   } catch (error) {
     console.error("Login error:", error.message);
     res.status(500).json({ error: "Error during login" });

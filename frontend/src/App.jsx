@@ -10,6 +10,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Funkcja do pobierania książek
   const fetchBooks = async () => {
@@ -38,12 +39,12 @@ function App() {
     const response = await fetch('http://localhost:3000/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, author }),
+      body: JSON.stringify({ title, author, userId: currentUser.id }),
     });
 
     if (!response.ok) {
-      console.error('Failed to add book:', response.statusText);
-      return alert('Nie udało się dodać książki');
+      const data = await response.json();
+      return alert(data.error || 'Nie udało się dodać książki');
     }
 
     const newBook = await response.json();
@@ -54,9 +55,17 @@ function App() {
 
   // Funkcja usuwająca książkę
   const handleDeleteBook = async (id) => {
-    await fetch(`http://localhost:3000/api/books/${id}`, {
+    const response = await fetch(`http://localhost:3000/api/books/${id}`, {
       method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUser.id }),
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      return alert(data.error || 'Nie udało się usunąć książki');
+    }
+
     setBooks(books.filter((book) => book.id !== id));
   };
 
@@ -77,6 +86,7 @@ function App() {
       return;
     }
 
+    setCurrentUser(data.user);
     setIsLoggedIn(true);
     setUsername('');
     setPassword('');
@@ -146,10 +156,13 @@ function App() {
   return (
     <>
       <div className="container">
-        <button className="logout-button"  onClick={() => setIsLoggedIn(false)}>
+        <div className="user-info">
+          Zalogowany jako: {currentUser?.username} ({currentUser?.role})
+        </div>
+        <button className="logout-button" onClick={() => setIsLoggedIn(false)}>
           Wyloguj
         </button>
-      </div >
+      </div>
       <div className="app-container">
         <h1>Lista książek</h1>
         <ul className="book-list">
@@ -158,40 +171,46 @@ function App() {
               <span>
                 {book.title} by {book.author}
               </span>
-              <button
-                className="delete-button"
-                onClick={() => handleDeleteBook(book.id)}
-              >
-                Usuń
-              </button>
+              {currentUser?.role === 'admin' && (
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteBook(book.id)}
+                >
+                  Usuń
+                </button>
+              )}
             </li>
           ))}
         </ul>
 
-        <h2>Dodaj książkę</h2>
-        <form className="book-form" onSubmit={handleAddBook}>
-          <input
-            className="auth-input"
-            type="text"
-            id="title"
-            placeholder="Tytuł"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <input
-            className="auth-input"
-            type="text"
-            id="author"
-            placeholder="Autor"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            required
-          />
-          <button className="add-button" type="submit">
-            Dodaj
-          </button>
-        </form>
+        {currentUser?.role === 'admin' && (
+          <>
+            <h2>Dodaj książkę</h2>
+            <form className="book-form" onSubmit={handleAddBook}>
+              <input
+                className="auth-input"
+                type="text"
+                id="title"
+                placeholder="Tytuł"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+              <input
+                className="auth-input"
+                type="text"
+                id="author"
+                placeholder="Autor"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                required
+              />
+              <button className="add-button" type="submit">
+                Dodaj
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </>
   );

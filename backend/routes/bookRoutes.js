@@ -1,17 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/bookController");
+const { checkRole } = require('../middleware/authMiddleware');
 
-// Obsługa GET /api/books
+// Publiczne endpointy
 router.get("/", bookController.getAllBooks);
 
-// Obsługa POST /api/books
-router.post("/", bookController.addBook);
-
-// Obsługa PUT /api/books/:id
-router.put("/:id", bookController.updateBook);
-
-// Obsługa DELETE /api/books/:id
-router.delete("/:id", bookController.deleteBook);
+// Endpointy wymagające roli admin
+router.post("/", checkRole(['admin']), bookController.addBook);
+router.put("/:id", checkRole(['admin']), bookController.updateBook);
+router.delete("/:id", checkRole(['admin']), bookController.deleteBook);
 
 module.exports = router;
