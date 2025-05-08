@@ -5,12 +5,15 @@ function App() {
   const [books, setBooks] = useState([]);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
+  const [content, setContent] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Funkcja do pobierania książek
   const fetchBooks = async () => {
@@ -39,7 +42,7 @@ function App() {
     const response = await fetch('http://localhost:3000/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, author, userId: currentUser.id }),
+      body: JSON.stringify({ title, author, content, userId: currentUser.id }),
     });
 
     if (!response.ok) {
@@ -51,6 +54,7 @@ function App() {
     setBooks([...books, newBook]);
     setTitle('');
     setAuthor('');
+    setContent('');
   };
 
   // Funkcja usuwająca książkę
@@ -67,6 +71,45 @@ function App() {
     }
 
     setBooks(books.filter((book) => book.id !== id));
+    if (selectedBook?.id === id) {
+      setSelectedBook(null);
+    }
+  };
+
+  // Funkcja edytująca książkę
+  const handleEditBook = async (e) => {
+    e.preventDefault();
+    if (!selectedBook) return;
+
+    const response = await fetch(`http://localhost:3000/api/books/${selectedBook.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        author,
+        content,
+        userId: currentUser.id
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      return alert(data.error || 'Nie udało się zaktualizować książki');
+    }
+
+    const updatedBook = await response.json();
+    setBooks(books.map(book => book.id === updatedBook.id ? updatedBook : book));
+    setSelectedBook(updatedBook);
+    setIsEditing(false);
+  };
+
+  // Funkcja do rozpoczęcia edycji
+  const startEditing = (book) => {
+    setSelectedBook(book);
+    setTitle(book.title);
+    setAuthor(book.author);
+    setContent(book.content || '');
+    setIsEditing(true);
   };
 
   // Funkcja logowania
@@ -168,25 +211,49 @@ function App() {
         <ul className="book-list">
           {books.map((book) => (
             <li key={book.id} className="book-item">
-              <span>
-                {book.title} by {book.author}
-              </span>
+              <div className="book-info" onClick={() => setSelectedBook(book)}>
+                <span>
+                  {book.title} by {book.author}
+                </span>
+                {book.content && <span className="has-content">✓</span>}
+              </div>
               {currentUser?.role === 'admin' && (
-                <button
-                  className="delete-button"
-                  onClick={() => handleDeleteBook(book.id)}
-                >
-                  Usuń
-                </button>
+                <div className="book-actions">
+                  <button
+                    className="edit-button"
+                    onClick={() => startEditing(book)}
+                  >
+                    Edytuj
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDeleteBook(book.id)}
+                  >
+                    Usuń
+                  </button>
+                </div>
               )}
             </li>
           ))}
         </ul>
 
+        {selectedBook && (
+          <div className="book-details">
+            <h2>{selectedBook.title}</h2>
+            <p className="book-author">Autor: {selectedBook.author}</p>
+            {selectedBook.content && (
+              <div className="book-content">
+                <h3>Treść:</h3>
+                <p>{selectedBook.content}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {currentUser?.role === 'admin' && (
           <>
-            <h2>Dodaj książkę</h2>
-            <form className="book-form" onSubmit={handleAddBook}>
+            <h2>{isEditing ? 'Edytuj książkę' : 'Dodaj książkę'}</h2>
+            <form className="book-form" onSubmit={isEditing ? handleEditBook : handleAddBook}>
               <input
                 className="auth-input"
                 type="text"
@@ -205,9 +272,33 @@ function App() {
                 onChange={(e) => setAuthor(e.target.value)}
                 required
               />
-              <button className="add-button" type="submit">
-                Dodaj
-              </button>
+              <textarea
+                className="content-input"
+                placeholder="Treść książki"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows="5"
+              />
+              <div className="form-buttons">
+                <button className="add-button" type="submit">
+                  {isEditing ? 'Zapisz zmiany' : 'Dodaj'}
+                </button>
+                {isEditing && (
+                  <button
+                    className="cancel-button"
+                    type="button"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setSelectedBook(null);
+                      setTitle('');
+                      setAuthor('');
+                      setContent('');
+                    }}
+                  >
+                    Anuluj
+                  </button>
+                )}
+              </div>
             </form>
           </>
         )}

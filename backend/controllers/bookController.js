@@ -12,13 +12,13 @@ exports.getAllBooks = (req, res) => {
 
 exports.addBook = (req, res) => {
   try {
-    const { title, author } = req.body;
+    const { title, author, content } = req.body;
 
     if (!title || !author) {
       return res.status(400).json({ error: "Brakuje tytułu lub autora" });
     }
 
-    const newBook = Book.create({ title, author });
+    const newBook = Book.create({ title, author, content });
     res.status(201).json(newBook);
   } catch (error) {
     console.error("Błąd addBook:", error.message);

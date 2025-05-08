@@ -11,9 +11,9 @@ class Book {
     return stmt.get(id);
   }
 
-  static create({ title, author }) {
-    const stmt = db.prepare('INSERT INTO books (title, author) VALUES (?, ?)');
-    const result = stmt.run(title, author);
+  static create({ title, author, content = '' }) {
+    const stmt = db.prepare('INSERT INTO books (title, author, content) VALUES (?, ?, ?)');
+    const result = stmt.run(title, author, content);
     return this.getById(result.lastInsertRowid);
   }
 
@@ -21,9 +21,14 @@ class Book {
     const book = this.getById(id);
     if (!book) return null;
 
-    const { title, author } = updates;
-    const stmt = db.prepare('UPDATE books SET title = ?, author = ? WHERE id = ?');
-    stmt.run(title || book.title, author || book.author, id);
+    const { title, author, content } = updates;
+    const stmt = db.prepare('UPDATE books SET title = ?, author = ?, content = ? WHERE id = ?');
+    stmt.run(
+      title || book.title,
+      author || book.author,
+      content !== undefined ? content : book.content,
+      id
+    );
     return this.getById(id);
   }
 

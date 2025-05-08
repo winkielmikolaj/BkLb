@@ -1,7 +1,11 @@
 .container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
 }
+
 .auth-container {
   max-width: 400px;
   margin: 50px auto;
@@ -32,7 +36,18 @@
   transition: border-color 0.3s ease;
 }
 
-.auth-input:focus {
+.content-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.auth-input:focus,
+.content-input:focus {
   outline: none;
   border-color: #4a90e2;
 }
@@ -99,12 +114,41 @@
   margin-bottom: 0.5rem;
   background-color: #f8f9fa;
   border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.book-item:hover {
+  background-color: #e9ecef;
+}
+
+.book-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.has-content {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.book-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .book-form {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
 }
 
 .logout-button {
@@ -114,7 +158,6 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 1rem;
 }
 
 .logout-button:hover {
@@ -134,6 +177,19 @@
   background-color: #c82333;
 }
 
+.edit-button {
+  padding: 5px 10px;
+  background-color: #ffc107;
+  color: #000;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: #e0a800;
+}
+
 .add-button {
   padding: 8px 16px;
   background-color: #28a745;
@@ -145,4 +201,42 @@
 
 .add-button:hover {
   background-color: #218838;
+}
+
+.cancel-button {
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.book-details {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.book-author {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.book-content {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+}
+
+.user-info {
+  font-size: 0.9rem;
+  color: #6c757d;
 }
