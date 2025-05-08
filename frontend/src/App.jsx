@@ -3,6 +3,7 @@ import './App.css';
 
 function App() {
   const [books, setBooks] = useState([]);
+  const [userLibrary, setUserLibrary] = useState([]);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
@@ -16,6 +17,7 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [wordsPerPage] = useState(300); // Liczba słów na stronę
+  const [activePage, setActivePage] = useState('main'); // 'main' lub 'library'
 
   // Funkcja do podziału tekstu na strony
   const splitContentIntoPages = (text) => {
@@ -39,9 +41,27 @@ function App() {
     setBooks(data);
   };
 
+  // Funkcja do pobierania biblioteki użytkownika
+  const fetchUserLibrary = async () => {
+    if (!currentUser) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${currentUser.id}/library`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user library');
+      }
+      const data = await response.json();
+      setUserLibrary(data);
+    } catch (error) {
+      console.error('Error fetching user library:', error);
+      alert('Nie udało się pobrać biblioteki użytkownika');
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn) {
       fetchBooks();
+      fetchUserLibrary();
     }
   }, [isLoggedIn]);
 
@@ -176,6 +196,66 @@ function App() {
     alert('Rejestracja udana! Możesz się teraz zalogować.');
   };
 
+  // Funkcja dodająca książkę do biblioteki użytkownika
+  const handleAddToLibrary = async (bookId) => {
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${currentUser.id}/library`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookId }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Nie udało się dodać książki do biblioteki');
+      }
+
+      await fetchUserLibrary();
+      alert('Książka została dodana do biblioteki!');
+    } catch (error) {
+      console.error('Error adding book to library:', error);
+      alert(error.message);
+    }
+  };
+
+  // Funkcja usuwająca książkę z biblioteki użytkownika
+  const handleRemoveFromLibrary = async (bookId) => {
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${currentUser.id}/library/${bookId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Nie udało się usunąć książki z biblioteki');
+      }
+
+      await fetchUserLibrary();
+      alert('Książka została usunięta z biblioteki!');
+    } catch (error) {
+      console.error('Error removing book from library:', error);
+      alert(error.message);
+    }
+  };
+
+  // Odśwież bibliotekę przy zmianie użytkownika
+  useEffect(() => {
+    if (currentUser) {
+      fetchUserLibrary();
+    }
+  }, [currentUser]);
+
+  // Odśwież bibliotekę przy zmianie aktywnej strony
+  useEffect(() => {
+    if (activePage === 'library') {
+      fetchUserLibrary();
+    }
+  }, [activePage]);
+
   if (!isLoggedIn) {
     return (
       <div className="auth-container">
@@ -217,35 +297,26 @@ function App() {
   const contentPages = selectedBook ? splitContentIntoPages(selectedBook.content) : [];
   const totalPages = contentPages.length;
 
-  return (
-    <>
-      <div className="container">
-        <div className="user-info">
-          Zalogowany jako: {currentUser?.username} ({currentUser?.role})
-        </div>
-        <button className="logout-button" onClick={() => setIsLoggedIn(false)}>
-          Wyloguj
-        </button>
-      </div>
-      <div className="app-container">
-        <h1>Lista książek</h1>
-        <div className="books-grid">
-          {books.map((book) => (
-            <div 
-              key={book.id} 
-              className="book-tile"
-              onClick={() => setSelectedBook(book)}
-            >
-              <div className="book-image-placeholder">
-                {/* Placeholder for future book cover images */}
-                <div className="book-image-text">{book.title.charAt(0)}</div>
-              </div>
-              <div className="book-tile-info">
-                <h3 className="book-title">{book.title}</h3>
-                <p className="book-author">{book.author}</p>
-                {book.content && <span className="has-content">✓</span>}
-                {currentUser?.role === 'admin' && (
-                  <div className="book-actions" onClick={(e) => e.stopPropagation()}>
+  const renderMainPage = () => (
+    <div className="app-container">
+      <h1>Lista książek</h1>
+      <div className="books-grid">
+        {books.map((book) => (
+          <div 
+            key={book.id} 
+            className="book-tile"
+            onClick={() => setSelectedBook(book)}
+          >
+            <div className="book-image-placeholder">
+              <div className="book-image-text">{book.title.charAt(0)}</div>
+            </div>
+            <div className="book-tile-info">
+              <h3 className="book-title">{book.title}</h3>
+              <p className="book-author">{book.author}</p>
+              {book.content && <span className="has-content">✓</span>}
+              <div className="book-actions" onClick={(e) => e.stopPropagation()}>
+                {currentUser?.role === 'admin' ? (
+                  <>
                     <button
                       className="edit-button"
                       onClick={() => startEditing(book)}
@@ -258,102 +329,205 @@ function App() {
                     >
                       Usuń
                     </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {selectedBook && (
-          <div className="book-details">
-            <h2>{selectedBook.title}</h2>
-            <p className="book-author">Autor: {selectedBook.author}</p>
-            {selectedBook.content && (
-              <div className="book-content">
-                <h3>Treść:</h3>
-                <div className="book-page">
-                  <p>{contentPages[currentPage - 1]}</p>
-                </div>
-                {totalPages > 1 && (
-                  <div className="pagination">
-                    <button
-                      className="page-button"
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Poprzednia
-                    </button>
-                    <span className="page-info">
-                      Strona {currentPage} z {totalPages}
-                    </span>
-                    <button
-                      className="page-button"
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Następna
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {currentUser?.role === 'admin' && (
-          <>
-            <h2>{isEditing ? 'Edytuj książkę' : 'Dodaj książkę'}</h2>
-            <form className="book-form" onSubmit={isEditing ? handleEditBook : handleAddBook}>
-              <input
-                className="auth-input"
-                type="text"
-                id="title"
-                placeholder="Tytuł"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-              <input
-                className="auth-input"
-                type="text"
-                id="author"
-                placeholder="Autor"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                required
-              />
-              <textarea
-                className="content-input"
-                placeholder="Treść książki"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows="5"
-              />
-              <div className="form-buttons">
-                <button className="add-button" type="submit">
-                  {isEditing ? 'Zapisz zmiany' : 'Dodaj'}
-                </button>
-                {isEditing && (
+                  </>
+                ) : (
                   <button
-                    className="cancel-button"
-                    type="button"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setSelectedBook(null);
-                      setTitle('');
-                      setAuthor('');
-                      setContent('');
-                    }}
+                    className={userLibrary.some(libBook => libBook.id === book.id) ? 'remove-from-library-button' : 'add-to-library-button'}
+                    onClick={() => userLibrary.some(libBook => libBook.id === book.id) ? handleRemoveFromLibrary(book.id) : handleAddToLibrary(book.id)}
                   >
-                    Anuluj
+                    {userLibrary.some(libBook => libBook.id === book.id) ? 'Usuń z biblioteki' : 'Dodaj do biblioteki'}
                   </button>
                 )}
               </div>
-            </form>
-          </>
-        )}
+            </div>
+          </div>
+        ))}
       </div>
+
+      {selectedBook && (
+        <div className="book-details">
+          <h2>{selectedBook.title}</h2>
+          <p className="book-author">Autor: {selectedBook.author}</p>
+          {selectedBook.content && (
+            <div className="book-content">
+              <h3>Treść:</h3>
+              <div className="book-page">
+                <p>{contentPages[currentPage - 1]}</p>
+              </div>
+              {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                    className="page-button"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Poprzednia
+                  </button>
+                  <span className="page-info">
+                    Strona {currentPage} z {totalPages}
+                  </span>
+                  <button
+                    className="page-button"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Następna
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {currentUser?.role === 'admin' && (
+        <>
+          <h2>{isEditing ? 'Edytuj książkę' : 'Dodaj książkę'}</h2>
+          <form className="book-form" onSubmit={isEditing ? handleEditBook : handleAddBook}>
+            <input
+              className="auth-input"
+              type="text"
+              id="title"
+              placeholder="Tytuł"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            <input
+              className="auth-input"
+              type="text"
+              id="author"
+              placeholder="Autor"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              required
+            />
+            <textarea
+              className="content-input"
+              placeholder="Treść książki"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows="5"
+            />
+            <div className="form-buttons">
+              <button className="add-button" type="submit">
+                {isEditing ? 'Zapisz zmiany' : 'Dodaj'}
+              </button>
+              {isEditing && (
+                <button
+                  className="cancel-button"
+                  type="button"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setSelectedBook(null);
+                    setTitle('');
+                    setAuthor('');
+                    setContent('');
+                  }}
+                >
+                  Anuluj
+                </button>
+              )}
+            </div>
+          </form>
+        </>
+      )}
+    </div>
+  );
+
+  const renderLibraryPage = () => (
+    <div className="app-container">
+      <h1>Moja biblioteka</h1>
+      <div className="books-grid">
+        {userLibrary.map((book) => (
+          <div 
+            key={book.id} 
+            className="book-tile"
+            onClick={() => setSelectedBook(book)}
+          >
+            <div className="book-image-placeholder">
+              <div className="book-image-text">{book.title.charAt(0)}</div>
+            </div>
+            <div className="book-tile-info">
+              <h3 className="book-title">{book.title}</h3>
+              <p className="book-author">{book.author}</p>
+              {book.content && <span className="has-content">✓</span>}
+              <div className="book-actions" onClick={(e) => e.stopPropagation()}>
+                <button
+                  className="remove-from-library-button"
+                  onClick={() => handleRemoveFromLibrary(book.id)}
+                >
+                  Usuń z biblioteki
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selectedBook && (
+        <div className="book-details">
+          <h2>{selectedBook.title}</h2>
+          <p className="book-author">Autor: {selectedBook.author}</p>
+          {selectedBook.content && (
+            <div className="book-content">
+              <h3>Treść:</h3>
+              <div className="book-page">
+                <p>{contentPages[currentPage - 1]}</p>
+              </div>
+              {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                    className="page-button"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Poprzednia
+                  </button>
+                  <span className="page-info">
+                    Strona {currentPage} z {totalPages}
+                  </span>
+                  <button
+                    className="page-button"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Następna
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <div className="container">
+        <div className="user-info">
+          Zalogowany jako: {currentUser?.username} ({currentUser?.role})
+        </div>
+        <div className="navigation">
+          <button 
+            className={`nav-button ${activePage === 'main' ? 'active' : ''}`}
+            onClick={() => setActivePage('main')}
+          >
+            Wszystkie książki
+          </button>
+          <button 
+            className={`nav-button ${activePage === 'library' ? 'active' : ''}`}
+            onClick={() => setActivePage('library')}
+          >
+            Moja biblioteka
+          </button>
+        </div>
+        <button className="logout-button" onClick={() => setIsLoggedIn(false)}>
+          Wyloguj
+        </button>
+      </div>
+      {activePage === 'main' ? renderMainPage() : renderLibraryPage()}
     </>
   );
 }

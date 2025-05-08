@@ -413,3 +413,60 @@
   font-size: 0.7rem;
   line-height: 1;
 }
+
+.navigation {
+  display: flex;
+  gap: 1rem;
+  margin: 0 1rem;
+}
+
+.nav-button {
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  background-color: #e9ecef;
+}
+
+.nav-button.active {
+  background-color: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+.add-to-library-button {
+  padding: 0.5rem 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.add-to-library-button:hover {
+  background-color: #357abd;
+}
+
+.remove-from-library-button {
+  padding: 0.5rem 1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.remove-from-library-button:hover {
+  background-color: #c82333;
+}

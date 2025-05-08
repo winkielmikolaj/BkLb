@@ -24,6 +24,16 @@ const initDB = () => {
         role TEXT NOT NULL DEFAULT 'user',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS user_library (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        book_id INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (book_id) REFERENCES books(id),
+        UNIQUE(user_id, book_id)
+      )
     `;
     db.exec(migration);
     console.log('Database tables created successfully');
