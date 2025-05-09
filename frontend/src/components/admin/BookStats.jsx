@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useBooks } from '../../contexts/BooksContext';
+import './BookStats.css';
 
 const BookStats = () => {
-  const { books, userLibrary } = useBooks();
+  const { books, allFavorites, fetchAllFavorites } = useBooks();
+  const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     totalBooks: 0,
     booksWithContent: 0,
@@ -16,38 +18,43 @@ const BookStats = () => {
     // Liczenie książek z treścią
     const booksWithContent = books.filter(book => book && book.content).length;
     
-    // Sprawdzenie liczby książek w bibliotekach użytkowników
-    const bookCounts = {};
-    if (userLibrary && Array.isArray(userLibrary)) {
-      userLibrary.forEach(book => {
-        if (book && book.id) {
-          bookCounts[book.id] = (bookCounts[book.id] || 0) + 1;
-        }
-      });
-    }
-
-    // Znalezienie najpopularniejszej książki
+    // Znajdowanie najpopularniejszej książki z wszystkich bibliotek
     let mostPopularBook = null;
-    let maxCount = 0;
     
-    books.forEach(book => {
-      if (book && book.id && bookCounts[book.id] > maxCount) {
-        mostPopularBook = book;
-        maxCount = bookCounts[book.id];
-      }
-    });
+    if (allFavorites && Array.isArray(allFavorites) && allFavorites.length > 0) {
+      mostPopularBook = allFavorites[0];
+    }
 
     setStats({
       totalBooks: books.length,
       booksWithContent,
-      booksInLibraries: Object.keys(bookCounts).length,
-      mostPopular: maxCount > 0 ? { book: mostPopularBook, count: maxCount } : null
+      booksInLibraries: allFavorites.length,
+      mostPopular: mostPopularBook ? { 
+        book: mostPopularBook, 
+        count: mostPopularBook.favorite_count 
+      } : null
     });
-  }, [books, userLibrary]);
+    
+    setRefreshing(false);
+  }, [books, allFavorites]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchAllFavorites();
+  };
 
   return (
     <div className="admin-section">
-      <h2>Statystyki książek</h2>
+      <div className="stats-header">
+        <h2>Statystyki książek</h2>
+        <button 
+          className="refresh-button" 
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          {refreshing ? 'Odświeżanie...' : 'Odśwież dane'}
+        </button>
+      </div>
       <div className="stats-container">
         <div className="stat-box">
           <div className="stat-value">{stats.totalBooks}</div>

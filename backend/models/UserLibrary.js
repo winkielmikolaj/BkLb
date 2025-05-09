@@ -42,6 +42,23 @@ class UserLibrary {
     }
   }
 
+  // Pobiera wszystkie ulubione książki i ich liczbę
+  static getAllFavoriteBooks() {
+    try {
+      const stmt = db.prepare(`
+        SELECT b.*, COUNT(ul.user_id) as favorite_count 
+        FROM books b
+        INNER JOIN user_library ul ON b.id = ul.book_id
+        GROUP BY b.id
+        ORDER BY favorite_count DESC
+      `);
+      return stmt.all();
+    } catch (error) {
+      console.error('Error getting all favorite books:', error);
+      throw error;
+    }
+  }
+
   // Sprawdza czy książka jest w bibliotece
   static isInLibrary(userId, bookId) {
     try {

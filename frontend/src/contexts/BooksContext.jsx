@@ -8,6 +8,7 @@ export const useBooks = () => useContext(BooksContext);
 export const BooksProvider = ({ children }) => {
   const [books, setBooks] = useState([]);
   const [userLibrary, setUserLibrary] = useState([]);
+  const [allFavorites, setAllFavorites] = useState([]);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
@@ -56,6 +57,20 @@ export const BooksProvider = ({ children }) => {
       alert('Nie udało się pobrać biblioteki użytkownika');
     }
   };
+  
+  // Pobiera ulubione książki wszystkich użytkowników
+  const fetchAllFavorites = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/users/stats/favorites');
+      if (!response.ok) {
+        throw new Error('Failed to fetch favorite books');
+      }
+      const data = await response.json();
+      setAllFavorites(data);
+    } catch (error) {
+      console.error('Error fetching all favorites:', error);
+    }
+  };
 
   // Dodaje nową książkę
   const handleAddBook = async (e) => {
@@ -99,6 +114,9 @@ export const BooksProvider = ({ children }) => {
     if (selectedBook?.id === id) {
       setSelectedBook(null);
     }
+    
+    // Odświeżenie statystyk
+    fetchAllFavorites();
   };
 
   // Edytuje książkę
@@ -154,6 +172,7 @@ export const BooksProvider = ({ children }) => {
       }
 
       await fetchUserLibrary();
+      await fetchAllFavorites(); // Odświeżenie statystyk po dodaniu do biblioteki
       alert('Książka została dodana do biblioteki!');
     } catch (error) {
       console.error('Error adding book to library:', error);
@@ -176,6 +195,7 @@ export const BooksProvider = ({ children }) => {
       }
 
       await fetchUserLibrary();
+      await fetchAllFavorites(); // Odświeżenie statystyk po usunięciu z biblioteki
       alert('Książka została usunięta z biblioteki!');
     } catch (error) {
       console.error('Error removing book from library:', error);
@@ -188,6 +208,7 @@ export const BooksProvider = ({ children }) => {
     if (isLoggedIn) {
       fetchBooks();
       fetchUserLibrary();
+      fetchAllFavorites();
     }
   }, [isLoggedIn, currentUser]);
 
@@ -199,6 +220,7 @@ export const BooksProvider = ({ children }) => {
   const value = {
     books,
     userLibrary,
+    allFavorites,
     title,
     setTitle,
     author,
@@ -215,6 +237,7 @@ export const BooksProvider = ({ children }) => {
     splitContentIntoPages,
     fetchBooks,
     fetchUserLibrary,
+    fetchAllFavorites,
     handleAddBook,
     handleDeleteBook,
     handleEditBook,

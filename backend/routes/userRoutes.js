@@ -12,4 +12,7 @@ router.get('/:userId/library', userLibraryController.getUserLibrary);
 router.post('/:userId/library', userLibraryController.addToLibrary);
 router.delete('/:userId/library/:bookId', userLibraryController.removeFromLibrary);
 
+// Endpoint dla statystyk
+router.get('/stats/favorites', userLibraryController.getAllFavoriteBooks);
+
 module.exports = router; 

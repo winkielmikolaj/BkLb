@@ -15,6 +15,16 @@ exports.getUserLibrary = (req, res) => {
   }
 };
 
+exports.getAllFavoriteBooks = (req, res) => {
+  try {
+    const favoriteBooks = UserLibrary.getAllFavoriteBooks();
+    res.json(favoriteBooks);
+  } catch (error) {
+    console.error("Error getting all favorite books:", error);
+    res.status(500).json({ error: "Error getting all favorite books" });
+  }
+};
+
 exports.addToLibrary = (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
