@@ -12,9 +12,15 @@ export const BooksProvider = ({ children }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
-  const [selectedBook, setSelectedBook] = useState(null);
+  
+  // Separate book selection for different views
+  const [selectedBook, setSelectedBook] = useState(null); // For catalog view
+  const [selectedLibraryBook, setSelectedLibraryBook] = useState(null); // For library view
+  const [activeView, setActiveView] = useState('catalog'); // 'catalog' or 'library'
+  
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentLibraryPage, setCurrentLibraryPage] = useState(1);
   const [wordsPerPage] = useState(300);
   
   const { currentUser, isLoggedIn } = useAuth();
@@ -114,6 +120,9 @@ export const BooksProvider = ({ children }) => {
     if (selectedBook?.id === id) {
       setSelectedBook(null);
     }
+    if (selectedLibraryBook?.id === id) {
+      setSelectedLibraryBook(null);
+    }
     
     // Odświeżenie statystyk
     fetchAllFavorites();
@@ -143,6 +152,12 @@ export const BooksProvider = ({ children }) => {
     const updatedBook = await response.json();
     setBooks(books.map(book => book.id === updatedBook.id ? updatedBook : book));
     setSelectedBook(updatedBook);
+    
+    // Aktualizacja książki w bibliotece, jeśli tam jest
+    if (selectedLibraryBook?.id === updatedBook.id) {
+      setSelectedLibraryBook(updatedBook);
+    }
+    
     setIsEditing(false);
   };
 
@@ -194,6 +209,11 @@ export const BooksProvider = ({ children }) => {
         throw new Error(data.error || 'Nie udało się usunąć książki z biblioteki');
       }
 
+      // If the removed book was selected in the library view, deselect it
+      if (selectedLibraryBook?.id === bookId) {
+        setSelectedLibraryBook(null);
+      }
+
       await fetchUserLibrary();
       await fetchAllFavorites(); // Odświeżenie statystyk po usunięciu z biblioteki
       alert('Książka została usunięta z biblioteki!');
@@ -212,10 +232,32 @@ export const BooksProvider = ({ children }) => {
     }
   }, [isLoggedIn, currentUser]);
 
-  // Reset paginacji przy zmianie książki
+  // Reset paginacji przy zmianie książki w katalogu
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedBook]);
+  
+  // Reset paginacji przy zmianie książki w bibliotece
+  useEffect(() => {
+    setCurrentLibraryPage(1);
+  }, [selectedLibraryBook]);
+
+  // Helper functions for current view
+  const getCurrentSelectedBook = () => {
+    return activeView === 'library' ? selectedLibraryBook : selectedBook;
+  };
+  
+  const getCurrentPage = () => {
+    return activeView === 'library' ? currentLibraryPage : currentPage;
+  };
+  
+  const setCurrentViewPage = (page) => {
+    if (activeView === 'library') {
+      setCurrentLibraryPage(page);
+    } else {
+      setCurrentPage(page);
+    }
+  };
 
   const value = {
     books,
@@ -229,10 +271,16 @@ export const BooksProvider = ({ children }) => {
     setContent,
     selectedBook,
     setSelectedBook,
+    selectedLibraryBook,
+    setSelectedLibraryBook,
+    activeView,
+    setActiveView,
     isEditing,
     setIsEditing,
     currentPage,
     setCurrentPage,
+    currentLibraryPage,
+    setCurrentLibraryPage,
     wordsPerPage,
     splitContentIntoPages,
     fetchBooks,
@@ -243,7 +291,11 @@ export const BooksProvider = ({ children }) => {
     handleEditBook,
     startEditing,
     handleAddToLibrary,
-    handleRemoveFromLibrary
+    handleRemoveFromLibrary,
+    // Helpers for current view
+    getCurrentSelectedBook,
+    getCurrentPage,
+    setCurrentViewPage
   };
 
   return <BooksContext.Provider value={value}>{children}</BooksContext.Provider>;

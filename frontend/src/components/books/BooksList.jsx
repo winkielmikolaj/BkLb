@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useBooks } from '../../contexts/BooksContext';
 import BookTile from './BookTile';
 
 const BooksList = () => {
-  const { books, setSelectedBook } = useBooks();
+  const { books, setSelectedBook, setActiveView } = useBooks();
+  
+  // Set active view to catalog when component mounts
+  useEffect(() => {
+    setActiveView('catalog');
+  }, [setActiveView]);
 
   // Zabezpieczenie przed błędami
   if (!books || !Array.isArray(books) || books.length === 0) {

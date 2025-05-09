@@ -3,11 +3,12 @@ import { useBooks } from '../../contexts/BooksContext';
 import BookTile from './BookTile';
 
 const UserLibrary = () => {
-  const { userLibrary, setSelectedBook, fetchUserLibrary } = useBooks();
+  const { userLibrary, setSelectedLibraryBook, fetchUserLibrary, setActiveView } = useBooks();
 
   useEffect(() => {
     fetchUserLibrary();
-  }, [fetchUserLibrary]);
+    setActiveView('library');
+  }, [fetchUserLibrary, setActiveView]);
 
   // Zabezpieczenie przed błędami
   if (!userLibrary || !Array.isArray(userLibrary)) {
@@ -27,7 +28,7 @@ const UserLibrary = () => {
           book && <BookTile 
             key={book.id || Math.random().toString()} 
             book={book}
-            onClick={() => setSelectedBook(book)}
+            onClick={() => setSelectedLibraryBook(book)}
             isLibraryView={true}
           />
         ))
