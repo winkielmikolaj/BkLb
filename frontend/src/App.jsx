@@ -18,7 +18,7 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [wordsPerPage] = useState(300);
-  const [activePage, setActivePage] = useState('main'); // przelaczanie miedzy main strona a biblioteka
+  const [activePage, setActivePage] = useState('main'); // przelaczanie miedzy stronami
 
   // Dzieli tekst na strony
   const splitContentIntoPages = (text) => {
@@ -317,29 +317,12 @@ function App() {
               <p className="book-author">{book.author}</p>
               {book.content && <span className="has-content">✓</span>}
               <div className="book-actions" onClick={(e) => e.stopPropagation()}>
-                {currentUser?.role === 'admin' ? (
-                  <>
-                    <button
-                      className="edit-button"
-                      onClick={() => startEditing(book)}
-                    >
-                      Edytuj
-                    </button>
-                    <button
-                      className="delete-button"
-                      onClick={() => handleDeleteBook(book.id)}
-                    >
-                      Usuń
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className={userLibrary.some(libBook => libBook.id === book.id) ? 'remove-from-library-button' : 'add-to-library-button'}
-                    onClick={() => userLibrary.some(libBook => libBook.id === book.id) ? handleRemoveFromLibrary(book.id) : handleAddToLibrary(book.id)}
-                  >
-                    {userLibrary.some(libBook => libBook.id === book.id) ? 'Usuń z biblioteki' : 'Dodaj do biblioteki'}
-                  </button>
-                )}
+                <button
+                  className={userLibrary.some(libBook => libBook.id === book.id) ? 'remove-from-library-button' : 'add-to-library-button'}
+                  onClick={() => userLibrary.some(libBook => libBook.id === book.id) ? handleRemoveFromLibrary(book.id) : handleAddToLibrary(book.id)}
+                >
+                  {userLibrary.some(libBook => libBook.id === book.id) ? 'Usuń z biblioteki' : 'Dodaj do biblioteki'}
+                </button>
               </div>
             </div>
           </div>
@@ -380,59 +363,6 @@ function App() {
             </div>
           )}
         </div>
-      )}
-
-      {currentUser?.role === 'admin' && (
-        <>
-          <h2>{isEditing ? 'Edytuj książkę' : 'Dodaj książkę'}</h2>
-          <form className="book-form" onSubmit={isEditing ? handleEditBook : handleAddBook}>
-            <input
-              className="auth-input"
-              type="text"
-              id="title"
-              placeholder="Tytuł"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-            <input
-              className="auth-input"
-              type="text"
-              id="author"
-              placeholder="Autor"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              required
-            />
-            <textarea
-              className="content-input"
-              placeholder="Treść książki"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows="5"
-            />
-            <div className="form-buttons">
-              <button className="add-button" type="submit">
-                {isEditing ? 'Zapisz zmiany' : 'Dodaj'}
-              </button>
-              {isEditing && (
-                <button
-                  className="cancel-button"
-                  type="button"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setSelectedBook(null);
-                    setTitle('');
-                    setAuthor('');
-                    setContent('');
-                  }}
-                >
-                  Anuluj
-                </button>
-              )}
-            </div>
-          </form>
-        </>
       )}
     </div>
   );
@@ -506,6 +436,103 @@ function App() {
     </div>
   );
 
+  // Renderuje panel administratora
+  const renderAdminPage = () => {
+    if (currentUser?.role !== 'admin') {
+      return (
+        <div className="app-container">
+          <h1>Brak dostępu</h1>
+          <p>Nie masz uprawnień do wyświetlenia tej strony.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="app-container">
+        <h1>Panel administratora</h1>
+        
+        <div className="admin-section">
+          <h2>{isEditing ? 'Edytuj książkę' : 'Dodaj książkę'}</h2>
+          <form className="book-form" onSubmit={isEditing ? handleEditBook : handleAddBook}>
+            <input
+              className="auth-input"
+              type="text"
+              id="title"
+              placeholder="Tytuł"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            <input
+              className="auth-input"
+              type="text"
+              id="author"
+              placeholder="Autor"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              required
+            />
+            <textarea
+              className="content-input"
+              placeholder="Treść książki"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows="5"
+            />
+            <div className="form-buttons">
+              <button className="add-button" type="submit">
+                {isEditing ? 'Zapisz zmiany' : 'Dodaj'}
+              </button>
+              {isEditing && (
+                <button
+                  className="cancel-button"
+                  type="button"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setSelectedBook(null);
+                    setTitle('');
+                    setAuthor('');
+                    setContent('');
+                  }}
+                >
+                  Anuluj
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        <div className="admin-section">
+          <h2>Zarządzanie książkami</h2>
+          <div className="admin-books-list">
+            {books.map((book) => (
+              <div key={book.id} className="admin-book-item">
+                <div className="admin-book-info">
+                  <h3>{book.title}</h3>
+                  <p>Autor: {book.author}</p>
+                </div>
+                <div className="admin-book-actions">
+                  <button
+                    className="edit-button"
+                    onClick={() => startEditing(book)}
+                  >
+                    Edytuj
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDeleteBook(book.id)}
+                  >
+                    Usuń
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="container">
@@ -525,12 +552,22 @@ function App() {
           >
             Moja biblioteka
           </button>
+          {currentUser?.role === 'admin' && (
+            <button 
+              className={`nav-button ${activePage === 'admin' ? 'active' : ''}`}
+              onClick={() => setActivePage('admin')}
+            >
+              Panel administratora
+            </button>
+          )}
         </div>
         <button className="logout-button" onClick={() => setIsLoggedIn(false)}>
           Wyloguj
         </button>
       </div>
-      {activePage === 'main' ? renderMainPage() : renderLibraryPage()}
+      {activePage === 'main' ? renderMainPage() : 
+       activePage === 'library' ? renderLibraryPage() : 
+       renderAdminPage()}
     </>
   );
 }
