@@ -470,3 +470,136 @@
 .remove-from-library-button:hover {
   background-color: #c82333;
 }
+
+/* Admin Panel Styles */
+.admin-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.admin-books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-book-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+  transition: all 0.2s ease;
+}
+
+.admin-book-item:hover {
+  background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.admin-book-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+}
+
+.admin-book-info p {
+  margin: 0;
+  color: #666;
+}
+
+.admin-book-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-button.active {
+  background-color: #2980b9;
+  color: white;
+}
+
+.nav-button:hover {
+  background-color: #e0e0e0;
+}
+
+.nav-button.active:hover {
+  background-color: #2472a4;
+}
+
+/* Form styles for admin panel */
+.book-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 600px;
+}
+
+.content-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 16px;
+  resize: vertical;
+  min-height: 150px;
+}
+
+.content-input:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.add-button, .edit-button, .delete-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-button {
+  background-color: #27ae60;
+  color: white;
+}
+
+.add-button:hover {
+  background-color: #219955;
+}
+
+.edit-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #2980b9;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.cancel-button {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #7f8c8d;
+}
