@@ -3,25 +3,40 @@ import { useBooks } from '../../contexts/BooksContext';
 import BookTile from './BookTile';
 
 const BooksList = () => {
-  const { books, setSelectedBook, setActiveView } = useBooks();
+  const { books, filteredBooks, searchTerm, setSelectedBook, setActiveView, allFavorites, fetchAllFavorites } = useBooks();
   
   // Set active view to catalog when component mounts
   useEffect(() => {
     setActiveView('catalog');
-  }, [setActiveView]);
+    // Upewniamy się, że mamy najnowsze dane o popularności
+    fetchAllFavorites();
+  }, [setActiveView, fetchAllFavorites]);
+
+  // Używamy filteredBooks jeśli jest searchTerm, w przeciwnym razie books
+  const displayBooks = searchTerm ? filteredBooks : books;
 
   // Zabezpieczenie przed błędami
-  if (!books || !Array.isArray(books) || books.length === 0) {
+  if (!displayBooks || !Array.isArray(displayBooks) || displayBooks.length === 0) {
     return (
       <div className="books-grid">
-        <p>Brak dostępnych książek.</p>
+        <p>{searchTerm ? 'Nie znaleziono książek spełniających kryteria wyszukiwania.' : 'Brak dostępnych książek.'}</p>
       </div>
     );
   }
 
+  // Znajdź popularną książkę
+  const getMostPopularBookId = () => {
+    if (allFavorites && Array.isArray(allFavorites) && allFavorites.length > 0) {
+      return allFavorites[0].id;
+    }
+    return null;
+  };
+
+  const popularBookId = getMostPopularBookId();
+
   return (
     <div className="books-grid">
-      {books.map((book) => (
+      {displayBooks.map((book) => (
         book && <BookTile 
           key={book.id || Math.random().toString()} 
           book={book}

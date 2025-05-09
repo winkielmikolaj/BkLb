@@ -1,5 +1,6 @@
 import React from 'react';
 import { useBooks } from '../../contexts/BooksContext';
+import { RiSaveLine, RiAddLine, RiCloseLine } from 'react-icons/ri';
 
 const BookForm = () => {
   const { 
@@ -25,50 +26,73 @@ const BookForm = () => {
   };
 
   return (
-    <div className="admin-section">
-      <h2>{isEditing ? 'Edytuj książkę' : 'Dodaj książkę'}</h2>
-      <form className="book-form" onSubmit={isEditing ? handleEditBook : handleAddBook}>
-        <input
-          className="auth-input"
-          type="text"
-          id="title"
-          placeholder="Tytuł"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <input
-          className="auth-input"
-          type="text"
-          id="author"
-          placeholder="Autor"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          required
-        />
-        <textarea
-          className="content-input"
-          placeholder="Treść książki"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows="5"
-        />
+    <>
+      <h2 className="form-title">{isEditing ? 'Edytuj książkę' : 'Dodaj nową książkę'}</h2>
+      <form className="form-container" onSubmit={isEditing ? handleEditBook : handleAddBook}>
+        <div className="form-row">
+          <div className="form-field">
+            <label className="form-label" htmlFor="title">Tytuł</label>
+            <input
+              className="form-input"
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-field">
+            <label className="form-label" htmlFor="author">Autor</label>
+            <input
+              className="form-input"
+              type="text"
+              id="author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="form-field">
+          <label className="form-label" htmlFor="content">Treść książki</label>
+          <textarea
+            className="content-input"
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows="10"
+          />
+        </div>
+        
         <div className="form-buttons">
-          <button className="add-button" type="submit">
-            {isEditing ? 'Zapisz zmiany' : 'Dodaj'}
-          </button>
           {isEditing && (
             <button
-              className="cancel-button"
+              className="btn btn-secondary"
               type="button"
               onClick={handleCancel}
             >
-              Anuluj
+              <RiCloseLine />
+              <span>Anuluj</span>
             </button>
           )}
+          
+          <button className={`btn ${isEditing ? 'btn-warning' : 'btn-success'}`} type="submit">
+            {isEditing ? (
+              <>
+                <RiSaveLine />
+                <span>Zapisz zmiany</span>
+              </>
+            ) : (
+              <>
+                <RiAddLine />
+                <span>Dodaj książkę</span>
+              </>
+            )}
+          </button>
         </div>
       </form>
-    </div>
+    </>
   );
 };
 

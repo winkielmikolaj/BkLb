@@ -13,6 +13,10 @@ export const BooksProvider = ({ children }) => {
   const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
   
+  // Dodajemy stan dla wyszukiwania
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredBooks, setFilteredBooks] = useState([]);
+  
   // Separate book selection for different views
   const [selectedBook, setSelectedBook] = useState(null); // For catalog view
   const [selectedLibraryBook, setSelectedLibraryBook] = useState(null); // For library view
@@ -25,6 +29,27 @@ export const BooksProvider = ({ children }) => {
   
   const { currentUser, isLoggedIn } = useAuth();
   
+  // Filtruje książki w zależności od term wyszukiwania
+  const filterBooks = (term) => {
+    if (!term || term.trim() === '') {
+      setFilteredBooks(books);
+      return;
+    }
+    
+    const lowerTerm = term.toLowerCase();
+    const filtered = books.filter(book => 
+      book.title?.toLowerCase().includes(lowerTerm) || 
+      book.author?.toLowerCase().includes(lowerTerm)
+    );
+    
+    setFilteredBooks(filtered);
+  };
+  
+  // Aktualizuje filtrowane książki przy zmianie search term lub books
+  useEffect(() => {
+    filterBooks(searchTerm);
+  }, [searchTerm, books]);
+
   // Dzieli tekst na strony
   const splitContentIntoPages = (text) => {
     if (!text) return [];
@@ -45,6 +70,7 @@ export const BooksProvider = ({ children }) => {
     }
     const data = await response.json();
     setBooks(data);
+    setFilteredBooks(data); // Inicjalizacja filtrowanych książek
   };
 
   // Pobiera bibliotekę użytkownika
@@ -295,7 +321,11 @@ export const BooksProvider = ({ children }) => {
     // Helpers for current view
     getCurrentSelectedBook,
     getCurrentPage,
-    setCurrentViewPage
+    setCurrentViewPage,
+    // Search functionality
+    searchTerm,
+    setSearchTerm,
+    filteredBooks
   };
 
   return <BooksContext.Provider value={value}>{children}</BooksContext.Provider>;

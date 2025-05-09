@@ -12,18 +12,30 @@ function App() {
   const { isLoggedIn } = useAuth();
   const [activePage, setActivePage] = useState('main');
 
+  const renderActivePage = () => {
+    switch (activePage) {
+      case 'main':
+        return <MainPage />;
+      case 'library':
+        return <LibraryPage />;
+      case 'admin':
+        return <AdminPage />;
+      default:
+        return <MainPage />;
+    }
+  };
+
   if (!isLoggedIn) {
-    return <AuthContainer />;
+    return <div className="app-wrapper fade-in"><AuthContainer /></div>;
   }
 
   return (
-    <>
+    <div className="app-wrapper">
       <Navigation activePage={activePage} setActivePage={setActivePage} />
-      
-      {activePage === 'main' ? <MainPage /> : 
-       activePage === 'library' ? <LibraryPage /> : 
-       <AdminPage />}
-    </>
+      <main className="page-container fade-in">
+        {renderActivePage()}
+      </main>
+    </div>
   );
 }
 
