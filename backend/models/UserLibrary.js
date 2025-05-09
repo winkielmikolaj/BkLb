@@ -1,6 +1,8 @@
 const { db } = require('../db');
 
+// Model biblioteki użytkownika
 class UserLibrary {
+  // Dodaje książkę do biblioteki
   static addToLibrary(userId, bookId) {
     try {
       const stmt = db.prepare('INSERT INTO user_library (user_id, book_id) VALUES (?, ?)');
@@ -12,6 +14,7 @@ class UserLibrary {
     }
   }
 
+  // Usuwa książkę z biblioteki
   static removeFromLibrary(userId, bookId) {
     try {
       const stmt = db.prepare('DELETE FROM user_library WHERE user_id = ? AND book_id = ?');
@@ -23,6 +26,7 @@ class UserLibrary {
     }
   }
 
+  // Pobiera bibliotekę użytkownika
   static getUserLibrary(userId) {
     try {
       const stmt = db.prepare(`
@@ -38,6 +42,7 @@ class UserLibrary {
     }
   }
 
+  // Sprawdza czy książka jest w bibliotece
   static isInLibrary(userId, bookId) {
     try {
       const stmt = db.prepare('SELECT * FROM user_library WHERE user_id = ? AND book_id = ?');

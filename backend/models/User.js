@@ -1,6 +1,8 @@
 const { db } = require('../db');
 
+// Model użytkownika
 class User {
+  // Tworzy nowego użytkownika
   static create({ username, password, role = 'user' }) {
     try {
       console.log('Creating user:', { username, role });
@@ -14,6 +16,7 @@ class User {
     }
   }
 
+  // Pobiera użytkownika po nazwie
   static getByUsername(username) {
     try {
       console.log('Getting user by username:', username);
@@ -27,6 +30,7 @@ class User {
     }
   }
 
+  // Pobiera użytkownika po ID
   static getById(id) {
     try {
       console.log('Getting user by ID:', id);
@@ -40,6 +44,7 @@ class User {
     }
   }
 
+  // Pobiera wszystkich użytkowników
   static getAll() {
     try {
       console.log('Getting all users');

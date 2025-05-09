@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
+// Główny komponent aplikacji
 function App() {
   const [books, setBooks] = useState([]);
   const [userLibrary, setUserLibrary] = useState([]);
@@ -16,10 +17,10 @@ function App() {
   const [selectedBook, setSelectedBook] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [wordsPerPage] = useState(300); // Liczba słów na stronę
-  const [activePage, setActivePage] = useState('main'); // 'main' lub 'library'
+  const [wordsPerPage] = useState(300);
+  const [activePage, setActivePage] = useState('main'); // przelaczanie miedzy main strona a biblioteka
 
-  // Funkcja do podziału tekstu na strony
+  // Dzieli tekst na strony
   const splitContentIntoPages = (text) => {
     if (!text) return [];
     const words = text.split(/\s+/);
@@ -30,7 +31,7 @@ function App() {
     return pages;
   };
 
-  // Funkcja do pobierania książek
+  // Pobiera listę książek
   const fetchBooks = async () => {
     const response = await fetch('http://localhost:3000/api/books');
     if (!response.ok) {
@@ -41,7 +42,7 @@ function App() {
     setBooks(data);
   };
 
-  // Funkcja do pobierania biblioteki użytkownika
+  // Pobiera bibliotekę użytkownika
   const fetchUserLibrary = async () => {
     if (!currentUser) return;
     
@@ -70,7 +71,7 @@ function App() {
     setCurrentPage(1);
   }, [selectedBook]);
 
-  // Funkcja dodająca książkę
+  // Dodaje nową książkę
   const handleAddBook = async (e) => {
     e.preventDefault();
     if (!title || !author) {
@@ -95,7 +96,7 @@ function App() {
     setContent('');
   };
 
-  // Funkcja usuwająca książkę
+  // Usuwa książkę
   const handleDeleteBook = async (id) => {
     const response = await fetch(`http://localhost:3000/api/books/${id}`, {
       method: 'DELETE',
@@ -114,7 +115,7 @@ function App() {
     }
   };
 
-  // Funkcja edytująca książkę
+  // Edytuje książkę
   const handleEditBook = async (e) => {
     e.preventDefault();
     if (!selectedBook) return;
@@ -141,7 +142,7 @@ function App() {
     setIsEditing(false);
   };
 
-  // Funkcja do rozpoczęcia edycji
+  // Rozpoczyna edycję książki
   const startEditing = (book) => {
     setSelectedBook(book);
     setTitle(book.title);
@@ -150,7 +151,7 @@ function App() {
     setIsEditing(true);
   };
 
-  // Funkcja logowania
+  // Loguje użytkownika
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -173,7 +174,7 @@ function App() {
     setPassword('');
   };
 
-  // Funkcja rejestracji
+  // Rejestruje użytkownika
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
@@ -196,7 +197,7 @@ function App() {
     alert('Rejestracja udana! Możesz się teraz zalogować.');
   };
 
-  // Funkcja dodająca książkę do biblioteki użytkownika
+  // Dodaje książkę do biblioteki
   const handleAddToLibrary = async (bookId) => {
     if (!currentUser) return;
 
@@ -220,7 +221,7 @@ function App() {
     }
   };
 
-  // Funkcja usuwająca książkę z biblioteki użytkownika
+  // Usuwa książkę z biblioteki
   const handleRemoveFromLibrary = async (bookId) => {
     if (!currentUser) return;
 
@@ -297,6 +298,7 @@ function App() {
   const contentPages = selectedBook ? splitContentIntoPages(selectedBook.content) : [];
   const totalPages = contentPages.length;
 
+  // Renderuje główną stronę
   const renderMainPage = () => (
     <div className="app-container">
       <h1>Lista książek</h1>
@@ -435,6 +437,7 @@ function App() {
     </div>
   );
 
+  // Renderuje stronę biblioteki
   const renderLibraryPage = () => (
     <div className="app-container">
       <h1>Moja biblioteka</h1>

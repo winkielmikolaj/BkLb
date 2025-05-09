@@ -1,9 +1,10 @@
 const User = require('../models/User');
 
+// Middleware sprawdzający uprawnienia użytkownika
 const checkRole = (roles) => {
   return (req, res, next) => {
     try {
-      const userId = req.body.userId; // Zakładamy, że userId jest przekazywane w body
+      const userId = req.body.userId;
       if (!userId) {
         return res.status(401).json({ error: 'Brak autoryzacji' });
       }

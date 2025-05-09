@@ -1,5 +1,6 @@
 const User = require('../models/User');
 
+// Rejestruje nowego użytkownika
 exports.register = (req, res) => {
   try {
     const { username, password } = req.body;
@@ -8,13 +9,13 @@ exports.register = (req, res) => {
       return res.status(400).json({ error: "Username and password are required" });
     }
 
-    // Check if user already exists
+    // Sprawdź czy użytkownik istenieje
     const existingUser = User.getByUsername(username);
     if (existingUser) {
       return res.status(400).json({ error: "Username already exists" });
     }
 
-    // Create new user
+    // Stwórz nowego użytkownika
     const user = User.create({ username, password });
     res.status(201).json({ message: "User registered successfully", userId: user.id });
   } catch (error) {
@@ -23,6 +24,7 @@ exports.register = (req, res) => {
   }
 };
 
+// Loguje użytkownika
 exports.login = (req, res) => {
   try {
     const { username, password } = req.body;
@@ -31,18 +33,18 @@ exports.login = (req, res) => {
       return res.status(400).json({ error: "Username and password are required" });
     }
 
-    // Find user
+    // Znajdź uzytkownika
     const user = User.getByUsername(username);
     if (!user) {
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    // Check password
+    // Sprawdz haslo
     if (user.password !== password) {
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    // Return user info without password
+    // Zwroc uzytkownika
     const { password: _, ...userInfo } = user;
     res.json({ message: "Login successful", user: userInfo });
   } catch (error) {
