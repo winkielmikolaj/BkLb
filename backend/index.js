@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const bookRoutes = require('./routes/bookRoutes'); // Upewnij się, że plik się zgadza
+const bookRoutes = require('./routes/bookRoutes');
 const userRoutes = require('./routes/userRoutes');
 require('./init'); // Importujemy inicjalizację bazy danych
 
@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/books', bookRoutes); // Wszystkie requesty do /api/books będą kierowane do bookRoutes
+app.use('/api/books', bookRoutes);
 app.use('/api/users', userRoutes);
 
 // Globalny middleware błędów

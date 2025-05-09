@@ -237,13 +237,13 @@
 }
 
 .book-content p {
-  white-space: pre-wrap;       /* Zachowuje podziały linii i spacje */
-  word-wrap: break-word;       /* Zawija długie słowa */
-  overflow-wrap: break-word;   /* Zawija długie słowa w nowszych przeglądarkach */
-  line-height: 1.6;           /* Zwiększa odstęp między liniami dla lepszej czytelności */
-  text-align: justify;        /* Wyrównuje tekst do obu marginesów */
-  max-width: 100%;           /* Zapewnia, że tekst nie wyjdzie poza kontener */
-  margin: 0;                 /* Usuwa domyślne marginesy */
+  white-space: pre-wrap;       
+  word-wrap: break-word;       
+  overflow-wrap: break-word;   
+  line-height: 1.6;           
+  text-align: justify;        
+  max-width: 100%;           
+  margin: 0;                 
 }
 
 .user-info {

@@ -45,7 +45,7 @@ const initDB = () => {
       console.log('Admin user not found, creating...');
       const newAdmin = User.create({
         username: 'admin',
-        password: 'admin123', // In a real application, this should be hashed
+        password: 'admin123',
         role: 'admin'
       });
       console.log('Admin user created successfully:', newAdmin);
