@@ -153,6 +153,13 @@ button, input, select, textarea {
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logout-button svg {
+  font-size: 1.25rem;
 }
 
 .logout-button:hover {
@@ -258,6 +265,14 @@ button, input, select, textarea {
   cursor: pointer;
   transition: var(--transition);
   margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.auth-button svg {
+  font-size: 1.25rem;
 }
 
 .auth-button:hover {
@@ -280,6 +295,13 @@ button, input, select, textarea {
   font-weight: 500;
   padding: 0.25rem;
   margin-left: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.auth-switch-button svg {
+  font-size: 1rem;
 }
 
 .auth-switch-button:hover {
