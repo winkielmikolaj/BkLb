@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { RiBookLine, RiBookmarkLine, RiDashboardLine, RiLogoutBoxLine, RiBookReadLine } from 'react-icons/ri';
+import { RiBookLine, RiBookmarkLine, RiDashboardLine, RiLogoutBoxLine, RiBookReadLine, RiMenuLine, RiCloseLine } from 'react-icons/ri';
 
 const Navigation = ({ activePage, setActivePage }) => {
   const { currentUser, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Pobierz inicjały użytkownika do awatara
   const getUserInitials = () => {
@@ -16,6 +17,15 @@ const Navigation = ({ activePage, setActivePage }) => {
       .substring(0, 2);
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleNavClick = (page) => {
+    setActivePage(page);
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="navigation">
       <div className="container nav-container">
@@ -24,41 +34,47 @@ const Navigation = ({ activePage, setActivePage }) => {
           <span>BookLib</span>
         </div>
         
-        <div className="nav-buttons">
-          <button 
-            className={`nav-button ${activePage === 'main' ? 'active' : ''}`}
-            onClick={() => setActivePage('main')}
-          >
-            <RiBookLine />
-            <span>Wszystkie książki</span>
-          </button>
-          <button 
-            className={`nav-button ${activePage === 'library' ? 'active' : ''}`}
-            onClick={() => setActivePage('library')}
-          >
-            <RiBookmarkLine />
-            <span>Moja biblioteka</span>
-          </button>
-          {currentUser?.role === 'admin' && (
+        <button className="menu-toggle" onClick={toggleMenu}>
+          {isMenuOpen ? <RiCloseLine /> : <RiMenuLine />}
+        </button>
+
+        <div className={`nav-content ${isMenuOpen ? 'active' : ''}`}>
+          <div className="nav-buttons">
             <button 
-              className={`nav-button ${activePage === 'admin' ? 'active' : ''}`}
-              onClick={() => setActivePage('admin')}
+              className={`nav-button ${activePage === 'main' ? 'active' : ''}`}
+              onClick={() => handleNavClick('main')}
             >
-              <RiDashboardLine />
-              <span>Panel administratora</span>
+              <RiBookLine />
+              <span>Wszystkie książki</span>
             </button>
-          )}
-        </div>
-        
-        <div className="user-controls">
-          <div className="user-info">
-            <div className="user-avatar">{getUserInitials()}</div>
-            <span>{currentUser?.username}</span>
+            <button 
+              className={`nav-button ${activePage === 'library' ? 'active' : ''}`}
+              onClick={() => handleNavClick('library')}
+            >
+              <RiBookmarkLine />
+              <span>Moja biblioteka</span>
+            </button>
+            {currentUser?.role === 'admin' && (
+              <button 
+                className={`nav-button ${activePage === 'admin' ? 'active' : ''}`}
+                onClick={() => handleNavClick('admin')}
+              >
+                <RiDashboardLine />
+                <span>Panel administratora</span>
+              </button>
+            )}
           </div>
-          <button className="logout-button" onClick={logout}>
-            <RiLogoutBoxLine />
-            <span>Wyloguj</span>
-          </button>
+          
+          <div className="user-controls">
+            <div className="user-info">
+              <div className="user-avatar">{getUserInitials()}</div>
+              <span>{currentUser?.username}</span>
+            </div>
+            <button className="logout-button" onClick={logout}>
+              <RiLogoutBoxLine />
+              <span>Wyloguj</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
