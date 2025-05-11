@@ -89,20 +89,4 @@ BookLib/
 ## Role użytkowników
 
 - **Użytkownik** - może przeglądać książki i zarządzać swoją biblioteką
-- **Administrator** - ma dostęp do panelu administracyjnego i pełnej kontroli nad systemem
-
-## Kontrybucja
-
-1. Utwórz fork projektu
-2. Utwórz nową gałąź dla swojej funkcjonalności (`git checkout -b feature/nowa-funkcjonalnosc`)
-3. Zatwierdź zmiany (`git commit -am 'Dodano nową funkcjonalność'`)
-4. Wypchnij zmiany do gałęzi (`git push origin feature/nowa-funkcjonalnosc`)
-5. Utwórz Pull Request
-
-## Licencja
-
-Ten projekt jest udostępniany na licencji MIT. Szczegóły znajdują się w pliku [LICENSE](LICENSE).
-
-## Kontakt
-
-W przypadku pytań lub sugestii, prosimy o kontakt przez system issues na GitHubie. 
+- **Administrator** - ma dostęp do panelu administracyjnego
