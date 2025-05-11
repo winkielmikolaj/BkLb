@@ -1,4 +1,4 @@
-/* Ten plik jest już importowany w App.css, ale dodajmy tu podstawowy reset */
+/* Ten plik jest już importowany w App.css */
 
 *, *::before, *::after {
   box-sizing: border-box;
